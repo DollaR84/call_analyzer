@@ -1,0 +1,10 @@
+faster-whisper
+ffmpeg-python
+openpyxl
+openai
+google-api-python-client
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
+pydantic
+pydantic-settings
