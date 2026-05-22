@@ -43,7 +43,7 @@ class TranscriptionService:
         )
 
         return TranscriptResult(
-            file_name=audio_path.name,
+            file_name=audio_path.stem,
             full_text="\n".join(full_text),
             language=language,
             segments=result_segments
