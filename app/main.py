@@ -10,6 +10,7 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(name)s | %(message)s"
 )
+logger = logging.getLogger(__name__)
 
 
 async def main() -> None:
@@ -19,6 +20,7 @@ async def main() -> None:
 
         unprocessed = await manager.run_sync()
         await transcriber.process(unprocessed)
+        logger.info("processed %d files", len(unprocessed))
 
 
 if __name__ == "__main__":
