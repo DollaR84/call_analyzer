@@ -30,9 +30,24 @@
 ## Встановлення
 
 ```bash
+git clone https://github.com/DollaR84/call_analyzer.git
+cd call_analyzer
+
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+```
+
+## Налаштування оточення
+
+Скопіюйте файл `.env.example` у `.env` та вкажіть свої значення:
+
+```bash
+# Linux / macOS / WSL / PowerShell
+cp .env.example .env
+
+# Windows (cmd)
+copy .env.example .env
 ```
 
 ## Запуск
@@ -72,9 +87,24 @@ The project collects audio recordings of managers' interactions with clients, cr
 ## Installed
 
 ```bash
+git clone https://github.com/DollaR84/call_analyzer.git
+cd call_analyzer
+
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+```
+
+## Environment Setup
+
+Copy the `.env.example` file to `.env` and configure your settings:
+
+```bash
+# Linux / macOS / WSL / PowerShell
+cp .env.example .env
+
+# Windows (cmd)
+copy .env.example .env
 ```
 
 ## Launch
