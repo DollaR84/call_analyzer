@@ -1,4 +1,5 @@
 from functools import lru_cache
+import os
 from pathlib import Path
 from typing import Optional
 
@@ -32,7 +33,9 @@ class WhisperConfig(BaseModel):
     compute_type: ComputeType
     device: WhisperDevice
     model: WhisperModel
+
     max_concurrent: int = 3
+    hf_token: Optional[str] = None
 
 
 class GoogleConfig(BaseModel):
@@ -65,4 +68,10 @@ class Config(BaseSettings):
 
 @lru_cache(maxsize=1)
 def get_config() -> Config:
-    return Config()
+    config = Config()
+
+    if config.whisper.hf_token:
+        os.environ["HF_TOKEN"] = config.whisper.hf_token
+        os.environ["HUGGINGFACE_HUB_TOKEN"] = config.whisper.hf_token
+
+    return config
