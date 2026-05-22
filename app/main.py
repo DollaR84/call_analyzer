@@ -1,8 +1,15 @@
 import asyncio
+import logging
 
 from core.container import get_container
 from manager import ProcessingManager
 from transcription.transcriber import Transcriber
+
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(name)s | %(message)s"
+)
 
 
 async def main() -> None:
