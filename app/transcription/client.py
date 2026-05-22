@@ -48,5 +48,5 @@ class WhisperClient:
         if isinstance(audio_source, str):
             audio_source = self._audio_to_numpy(audio_source)
 
-        segments, info = self.model.transcribe(audio_source)
+        segments, info = self.model.transcribe(audio_source, task="transcribe", condition_on_previous_text=False)
         return segments, info
