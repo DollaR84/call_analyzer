@@ -13,7 +13,6 @@ from faster_whisper.transcribe import Segment, TranscriptionInfo
 from core.config import WhisperConfig
 
 
-logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
 logger = logging.getLogger(__name__)
 
 
