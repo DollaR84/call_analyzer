@@ -14,7 +14,6 @@ from utils.google import extract_folder_id
 class PathConfig(BaseModel):
     data_dir: Path = Path("data")
     audio_subdir: Path = Path("audio")
-    reports_subdir: Path = Path("reports")
     transcripts_subdir: Path = Path("transcripts")
 
     max_concurrent: int = 5
@@ -22,10 +21,6 @@ class PathConfig(BaseModel):
     @property
     def audio_path(self) -> Path:
         return self.data_dir / self.audio_subdir
-
-    @property
-    def reports_path(self) -> Path:
-        return self.data_dir / self.reports_subdir
 
     @property
     def transcription_path(self) -> Path:
