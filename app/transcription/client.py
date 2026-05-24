@@ -10,7 +10,9 @@ from tqdm import tqdm
 from faster_whisper import WhisperModel
 from faster_whisper.transcribe import Segment, TranscriptionInfo
 
-from core.config import WhisperConfig
+from core.types import Device
+
+from .types import ComputeType, WhisperModelType
 
 
 logger = logging.getLogger(__name__)
@@ -18,14 +20,14 @@ logger = logging.getLogger(__name__)
 
 class WhisperClient:
 
-    def __init__(self, config: WhisperConfig):
+    def __init__(self, model: WhisperModelType, device: Device, compute_type: ComputeType):
         start_time = time.time()
 
         with tqdm(total=0, bar_format="{desc}", desc="Loading Whisper model into memory... "):
             self.model = WhisperModel(
-                config.model,
-                device=config.device,
-                compute_type=config.compute_type,
+                model,
+                device=device,
+                compute_type=compute_type,
             )
 
         logger.info("Model loaded successfully in %.2f seconds!", time.time() - start_time)
@@ -48,5 +50,16 @@ class WhisperClient:
         if isinstance(audio_source, str):
             audio_source = self._audio_to_numpy(audio_source)
 
-        segments, info = self.model.transcribe(audio_source, task="transcribe", condition_on_previous_text=False)
+        segments, info = self.model.transcribe(
+            audio_source,
+            task="transcribe",
+            vad_filter=True,
+            vad_parameters={
+                "min_silence_duration_ms": 400,
+                "speech_pad_ms": 400,
+                "threshold": 0.4,
+            },
+            condition_on_previous_text=True,
+            beam_size=5,
+        )
         return segments, info

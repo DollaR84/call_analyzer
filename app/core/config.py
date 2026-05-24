@@ -6,7 +6,8 @@ from typing import Optional
 from pydantic import BaseModel, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from transcription.types import ComputeType, WhisperDevice, WhisperModel
+from core.types import Device
+from transcription.types import ComputeType, WhisperModelType
 from utils.google import extract_folder_id
 
 
@@ -15,6 +16,8 @@ class PathConfig(BaseModel):
     audio_subdir: Path = Path("audio")
     reports_subdir: Path = Path("reports")
     transcripts_subdir: Path = Path("transcripts")
+
+    max_concurrent: int = 5
 
     @property
     def audio_path(self) -> Path:
@@ -29,20 +32,22 @@ class PathConfig(BaseModel):
         return self.data_dir / self.transcripts_subdir
 
 
+class MLConfig(BaseModel):
+    device: Device
+    hf_token: Optional[str] = None
+    max_concurrent: int = 3
+
+
 class WhisperConfig(BaseModel):
     compute_type: ComputeType
-    device: WhisperDevice
-    model: WhisperModel
-
-    max_concurrent: int = 3
-    hf_token: Optional[str] = None
+    model: WhisperModelType
 
 
 class GoogleConfig(BaseModel):
     credentials_path: Optional[Path] = None
     audio_folder: Optional[str] = None
 
-    max_concurrent_downloads: int = 1
+    max_concurrent: int = 1
     max_retries: int = 5
 
     @field_validator("audio_folder")
@@ -61,6 +66,7 @@ class GoogleConfig(BaseModel):
 class Config(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_nested_delimiter="__")
 
+    ml: MLConfig
     whisper: WhisperConfig
     paths: PathConfig = Field(default_factory=PathConfig)
     google: GoogleConfig = Field(default_factory=GoogleConfig)
@@ -70,8 +76,8 @@ class Config(BaseSettings):
 def get_config() -> Config:
     config = Config()
 
-    if config.whisper.hf_token:
-        os.environ["HF_TOKEN"] = config.whisper.hf_token
-        os.environ["HUGGINGFACE_HUB_TOKEN"] = config.whisper.hf_token
+    if config.ml.hf_token:
+        os.environ["HF_TOKEN"] = config.ml.hf_token
+        os.environ["HUGGINGFACE_HUB_TOKEN"] = config.ml.hf_token
 
     return config

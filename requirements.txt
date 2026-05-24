@@ -1,4 +1,8 @@
 faster-whisper
+speechbrain
+scikit-learn
+torch
+torchaudio
 ffmpeg-python
 openpyxl
 openai

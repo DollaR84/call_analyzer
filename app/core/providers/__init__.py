@@ -1,10 +1,14 @@
 from .app import AppProvider
+from .diarization import DiarizationProvider
 from .drive import DriveProvider
-from .transcriber import TranscriberProvider
+from .formatter import FormatterProvider
+from .transcription import TranscriptionProvider
 
 
 __all__ = (
     "AppProvider",
     "DriveProvider",
-    "TranscriberProvider",
+    "DiarizationProvider",
+    "TranscriptionProvider",
+    "FormatterProvider",
 )

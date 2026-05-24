@@ -3,8 +3,9 @@ from pathlib import Path
 
 from tqdm import tqdm
 
+from schemas import Transcript, TranscriptSegment
+
 from .client import WhisperClient
-from .schemas import TranscriptResult, TranscriptSegment
 
 
 class TranscriptionService:
@@ -36,13 +37,13 @@ class TranscriptionService:
 
         return result_segments, full_text, info.language
 
-    async def transcribe(self, audio_path: Path) -> TranscriptResult:
+    async def transcribe(self, audio_path: Path) -> Transcript:
         result_segments, full_text, language = await asyncio.to_thread(
             self._sync_transcribe,
             audio_path
         )
 
-        return TranscriptResult(
+        return Transcript(
             file_name=audio_path.stem,
             full_text="\n".join(full_text),
             language=language,

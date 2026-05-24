@@ -1,11 +1,19 @@
 from dishka import AsyncContainer, make_async_container
 
-from .providers import AppProvider, DriveProvider, TranscriberProvider
+from .providers import (
+    AppProvider,
+    DriveProvider,
+    DiarizationProvider,
+    TranscriptionProvider,
+    FormatterProvider,
+)
 
 
 def get_container() -> AsyncContainer:
     return make_async_container(
         AppProvider(),
         DriveProvider(),
-        TranscriberProvider(),
+        TranscriptionProvider(),
+        DiarizationProvider(),
+        FormatterProvider(),
     )

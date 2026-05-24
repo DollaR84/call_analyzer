@@ -2,8 +2,9 @@ import asyncio
 from pathlib import Path
 from typing import Protocol
 
+from schemas import DriveFile
+
 from .client import GoogleDriveClient
-from .schemas import DriveFile
 
 
 class DriveServiceProtocol(Protocol):

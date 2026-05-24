@@ -4,6 +4,7 @@ from dishka import Provider, Scope, provide
 
 from core import Config
 from drive import GoogleDriveClient, DriveServiceProtocol, GoogleDriveService, NullDriveService
+from drive import DriveManager, ManagerData
 
 
 class DriveProvider(Provider):
@@ -19,3 +20,16 @@ class DriveProvider(Provider):
         if client is None:
             return NullDriveService()
         return GoogleDriveService(client)
+
+    @provide(scope=Scope.APP)
+    async def get_manager_data(self, config: Config) -> ManagerData:
+        return ManagerData(
+            audio_path=config.paths.audio_path,
+            transcription_path=config.paths.transcription_path,
+            folder_id=config.google.audio_folder or "",
+            max_concurrent=config.google.max_concurrent,
+        )
+
+    @provide(scope=Scope.APP)
+    async def get_manager(self, config: ManagerData, drive: DriveServiceProtocol) -> DriveManager:
+        return DriveManager(config, drive)

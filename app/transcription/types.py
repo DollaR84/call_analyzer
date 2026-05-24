@@ -7,13 +7,7 @@ class ComputeType(StrEnum):
     FLOAT32 = "float32"
 
 
-class WhisperDevice(StrEnum):
-    CPU = "cpu"
-    CUDA = "cuda"
-    AUTO = "auto"
-
-
-class WhisperModel(StrEnum):
+class WhisperModelType(StrEnum):
     TINY = "tiny"
     BASE = "base"
     SMALL = "small"
