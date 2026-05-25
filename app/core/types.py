@@ -1,7 +1,7 @@
 from enum import StrEnum
 
 
-class Device(StrEnum):
+class DeviceType(StrEnum):
     CPU = "cpu"
     CUDA = "cuda"
     AUTO = "auto"

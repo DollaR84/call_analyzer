@@ -6,7 +6,7 @@ from typing import Optional
 from pydantic import BaseModel, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from core.types import Device
+from core.types import DeviceType
 from transcription.types import ComputeType, WhisperModelType
 from utils.google import extract_folder_id
 
@@ -28,7 +28,7 @@ class PathConfig(BaseModel):
 
 
 class MLConfig(BaseModel):
-    device: Device
+    device: DeviceType
     hf_token: Optional[str] = None
     max_concurrent: int = 3
 

@@ -9,7 +9,7 @@ from tqdm import tqdm
 import torch
 import torchaudio
 
-from core.types import Device
+from core.types import DeviceType
 from schemas import TranscriptSegment
 
 
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 class DiarizationClient:
 
-    def __init__(self, device: Device):
+    def __init__(self, device: DeviceType):
         start_time = time.time()
 
         with tqdm(total=0, bar_format="{desc}", desc="Loading diarization model into memory... "):

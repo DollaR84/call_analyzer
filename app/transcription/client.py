@@ -10,7 +10,7 @@ from tqdm import tqdm
 from faster_whisper import WhisperModel
 from faster_whisper.transcribe import Segment, TranscriptionInfo
 
-from core.types import Device
+from core.types import DeviceType
 
 from .types import ComputeType, WhisperModelType
 
@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 class WhisperClient:
 
-    def __init__(self, model: WhisperModelType, device: Device, compute_type: ComputeType):
+    def __init__(self, model: WhisperModelType, device: DeviceType, compute_type: ComputeType):
         start_time = time.time()
 
         with tqdm(total=0, bar_format="{desc}", desc="Loading Whisper model into memory... "):
