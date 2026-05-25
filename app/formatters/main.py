@@ -3,9 +3,7 @@ import logging
 
 from schemas import OutputFiles, Transcript
 
-from .excel import ExcelWriter
-from .json import JsonWriter
-from .txt import TxtWriter
+from .writers import BaseWriter
 
 
 logger = logging.getLogger(__name__)
@@ -13,23 +11,22 @@ logger = logging.getLogger(__name__)
 
 class FormatterManager:
 
-    def __init__(
-            self,
-            excel_writer: ExcelWriter,
-            json_writer: JsonWriter,
-            txt_writer: TxtWriter,
-            max_concurrent: int = 5,
-    ):
-        self.excel_writer = excel_writer
-        self.json_writer = json_writer
-        self.txt_writer = txt_writer
+    def __init__(self, writers: list[BaseWriter], max_concurrent: int = 5):
+        self.writers = writers
         self.max_concurrent = max_concurrent
 
     def _sync_save(self, data: Transcript) -> OutputFiles:
-        self.excel_writer.save(data)
-        json_path = self.json_writer.save(data)
-        txt_path = self.txt_writer.save(data)
-        return OutputFiles(json=json_path, txt=txt_path)
+        saved_paths = {}
+
+        for writer in self.writers:
+            name = writer.get_name()
+            try:
+                path = writer.save(data)
+                saved_paths[name] = path
+            except OSError as e:
+                logger.error("Error saving with formatter %s: %s", name, e)
+
+        return OutputFiles(**saved_paths)
 
     async def save(self, data: Transcript) -> OutputFiles:
         return await asyncio.to_thread(self._sync_save, data)

@@ -3,15 +3,13 @@ from pathlib import Path
 
 from schemas import Transcript
 
+from .base import BaseWriter
+
 
 logger = logging.getLogger(__name__)
 
 
-class TxtWriter:
-
-    def __init__(self, output_dir: Path):
-        self.output_dir = output_dir
-        self.output_dir.mkdir(parents=True, exist_ok=True)
+class TxtWriter(BaseWriter):
 
     def _get_full_text(self, data: Transcript) -> str:
         full_text = data.full_text
@@ -24,9 +22,9 @@ class TxtWriter:
 
         return full_text
 
-    def save(self, data: Transcript) -> Path:
-        output_file = self.output_dir / f"{data.file_name}.txt"
-        full_text = self._get_full_text(data)
+    def save(self, transcript: Transcript) -> Path:
+        output_file = self.output_dir / f"{transcript.file_name}.txt"
+        full_text = self._get_full_text(transcript)
         output_file.write_text(full_text, encoding="utf-8")
 
         logger.info("saved txt file: %s", output_file.name)

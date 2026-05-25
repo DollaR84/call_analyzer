@@ -9,22 +9,24 @@ from openpyxl.worksheet.worksheet import Worksheet
 
 from schemas import Transcript
 
+from .base import BaseWriter
+
 
 logger = logging.getLogger(__name__)
 
 
-class ExcelWriter:
+class ExcelWriter(BaseWriter):
 
-    def __init__(self, data_dir: Path):
-        self.data_dir = data_dir
+    def __init__(self, output_dir: Path):
+        super().__init__(output_dir)
 
         self.wb: Optional[Workbook] = None
         self.sheet: Optional[Worksheet] = None
 
     def open(self) -> Optional[Path]:
-        xlsx_file = next(self.data_dir.glob("*.xlsx"), None)
+        xlsx_file = next(self.output_dir.glob("*.xlsx"), None)
         if not xlsx_file:
-            logger.warning("No .xlsx files found in '%s'", str(self.data_dir))
+            logger.warning("No .xlsx files found in '%s'", str(self.output_dir))
             return None
 
         try:
@@ -60,11 +62,10 @@ class ExcelWriter:
         time_clean = time_part.replace("-", ":")
         return datetime.strptime(f"{date_part} {time_clean}", "%Y-%m-%d %H:%M")
 
-    def save(self, transcript: Transcript) -> None:
+    def save(self, transcript: Transcript) -> Path:
         xlsx_file = self.open()
         if xlsx_file is None or self.wb is None or self.sheet is None:
-            logger.error("Cannot save transcript: Excel file or worksheet is not initialized.")
-            return
+            raise RuntimeError("Cannot save transcript: Excel file or worksheet is not initialized.")
 
         column_date = 1
         column_transcript = 21
@@ -104,7 +105,7 @@ class ExcelWriter:
         except PermissionError as e:
             logger.error(
                 "permission error: file '%s' is open in another program (Excel) or locked: %s",
-                xlsx_file.name, e
+                xlsx_file.name, e, exc_info=True
             )
         except OSError as e:
             logger.error("System I/O error while saving '%s': %s", xlsx_file.name, e, exc_info=True)
@@ -113,3 +114,5 @@ class ExcelWriter:
             self.close()
             self.sheet = None
             self.wb = None
+
+        return xlsx_file

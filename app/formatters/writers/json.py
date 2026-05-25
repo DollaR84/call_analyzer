@@ -4,15 +4,13 @@ from pathlib import Path
 
 from schemas import Transcript
 
+from .base import BaseWriter
+
 
 logger = logging.getLogger(__name__)
 
 
-class JsonWriter:
-
-    def __init__(self, output_dir: Path):
-        self.output_dir = output_dir
-        self.output_dir.mkdir(parents=True, exist_ok=True)
+class JsonWriter(BaseWriter):
 
     def save(self, transcript: Transcript) -> Path:
         output_file = self.output_dir / f"{transcript.file_name}.json"
