@@ -6,6 +6,7 @@ from .providers import (
     DiarizationProvider,
     TranscriptionProvider,
     FormatterProvider,
+    LLMProvider,
 )
 
 
@@ -16,4 +17,5 @@ def get_container() -> AsyncContainer:
         TranscriptionProvider(),
         DiarizationProvider(),
         FormatterProvider(),
+        LLMProvider(),
     )

@@ -30,5 +30,5 @@ class BaseWriter(ABC):
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
     @abstractmethod
-    def save(self, transcript: Transcript) -> Path:
+    def save(self, data: Transcript) -> Path:
         raise NotImplementedError

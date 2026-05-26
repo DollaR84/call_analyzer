@@ -22,9 +22,9 @@ class TxtWriter(BaseWriter):
 
         return full_text
 
-    def save(self, transcript: Transcript) -> Path:
-        output_file = self.output_dir / f"{transcript.file_name}.txt"
-        full_text = self._get_full_text(transcript)
+    def save(self, data: Transcript) -> Path:
+        output_file = self.output_dir / f"{data.file_name}.txt"
+        full_text = self._get_full_text(data)
         output_file.write_text(full_text, encoding="utf-8")
 
         logger.info("saved txt file: %s", output_file.name)

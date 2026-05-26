@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from core.types import DeviceType
+from llm.types import LLMType
 from transcription.types import ComputeType, WhisperModelType
 from utils.google import extract_folder_id
 
@@ -15,6 +16,10 @@ class PathConfig(BaseModel):
     data_dir: Path = Path("data")
     audio_subdir: Path = Path("audio")
     transcripts_subdir: Path = Path("transcripts")
+
+    prompts_subdir: Path = Path("prompts")
+    prompt_system: Path = Path("system")
+    prompt_detail: Path = Path("detail")
 
     max_concurrent: int = 5
 
@@ -25,6 +30,18 @@ class PathConfig(BaseModel):
     @property
     def transcription_path(self) -> Path:
         return self.data_dir / self.transcripts_subdir
+
+    @property
+    def prompts_path(self) -> Path:
+        return self.data_dir / self.prompts_subdir
+
+    @property
+    def prompt_system_file(self) -> Path:
+        return self.prompts_path / self.prompt_system
+
+    @property
+    def prompt_detail_file(self) -> Path:
+        return self.prompts_path / self.prompt_detail
 
 
 class MLConfig(BaseModel):
@@ -58,11 +75,20 @@ class GoogleConfig(BaseModel):
         return bool(self.credentials_path and self.audio_folder)
 
 
+class LlmConfig(BaseModel):
+    name: LLMType
+
+    base_url: str
+    api_key: str
+    model: str
+
+
 class Config(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_nested_delimiter="__")
 
     ml: MLConfig
     whisper: WhisperConfig
+    llm: LlmConfig
     paths: PathConfig = Field(default_factory=PathConfig)
     google: GoogleConfig = Field(default_factory=GoogleConfig)
 

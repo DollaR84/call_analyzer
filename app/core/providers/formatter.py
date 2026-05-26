@@ -1,7 +1,7 @@
 from dishka import Provider, Scope, provide
 
 from core import Config
-from formatters import FormatterManager
+from formatters import FormatterContainer, FormatterManager
 from formatters.writers import ExcelWriter, JsonWriter, TxtWriter
 
 
@@ -27,5 +27,9 @@ class FormatterProvider(Provider):
             json_writer: JsonWriter,
             txt_writer: TxtWriter,
     ) -> FormatterManager:
-        writers = [excel_writer, json_writer, txt_writer]
+        writers = FormatterContainer(
+            excel=excel_writer,
+            json=json_writer,
+            txt=txt_writer,
+        )
         return FormatterManager(writers, config.paths.max_concurrent)

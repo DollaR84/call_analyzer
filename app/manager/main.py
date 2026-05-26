@@ -9,6 +9,7 @@ from drive import DriveManager
 from formatters import FormatterManager
 from diarization import DiarizationManager
 from transcription import TranscriptionManager
+from llm import LLMService
 from schemas import OutputFiles
 
 
@@ -20,7 +21,7 @@ class ProcessingManager:
     def __init__(self, container: AsyncContainer):
         self.container = container
 
-    async def _processing(
+    async def _process_audio_to_text(
             self,
             audio_file: Path,
             transcripter: TranscriptionManager,
@@ -32,6 +33,21 @@ class ProcessingManager:
         files = await formatter.save(transcript)
         return files
 
+    async def _process_analyze_text(
+            self,
+            files: OutputFiles,
+            llm: LLMService,
+            formatter: FormatterManager,
+    ) -> OutputFiles:
+        report = await llm.process(files)
+
+        if report:
+            await formatter.report(report)
+        else:
+            logger.warning("LLM analyze call '%s' failed!", files.json.stem)
+
+        return files
+
     async def process(self) -> list[OutputFiles]:
         valid_results = []
         async with self.container as container:
@@ -40,13 +56,15 @@ class ProcessingManager:
             formatter = await container.get(FormatterManager)
             transcripter = await container.get(TranscriptionManager)
             diarizer = await container.get(DiarizationManager)
+            llm = await container.get(LLMService)
 
             unprocessed = await driver.run_sync()
             semaphore = asyncio.Semaphore(config.ml.max_concurrent)
 
             async def sem_processing(audio_file: Path) -> OutputFiles:
                 async with semaphore:
-                    return await self._processing(audio_file, transcripter, diarizer, formatter)
+                    files = await self._process_audio_to_text(audio_file, transcripter, diarizer, formatter)
+                    return await self._process_analyze_text(files, llm, formatter)
 
             tasks = [
                 sem_processing(audio_file)

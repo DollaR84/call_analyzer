@@ -1,8 +1,11 @@
 import asyncio
 import logging
+from pathlib import Path
+from typing import Callable, Optional
 
-from schemas import OutputFiles, Transcript
+from schemas import OutputFiles, Report, Transcript
 
+from .data import FormatterContainer
 from .writers import BaseWriter
 
 
@@ -11,25 +14,45 @@ logger = logging.getLogger(__name__)
 
 class FormatterManager:
 
-    def __init__(self, writers: list[BaseWriter], max_concurrent: int = 5):
+    def __init__(self, writers: FormatterContainer, max_concurrent: int = 5):
         self.writers = writers
         self.max_concurrent = max_concurrent
+
+    def _safe_execute(self, func: Callable[[], Path], action_name: str, writer_name: str) -> Optional[Path]:
+        try:
+            return func()
+        except OSError as e:
+            logger.error("Error saving '%s' with formatter %s: %s", action_name, writer_name, e)
+            return None
 
     def _sync_save(self, data: Transcript) -> OutputFiles:
         saved_paths = {}
 
-        for writer in self.writers:
-            name = writer.get_name()
-            try:
-                path = writer.save(data)
+        for name, writer in self.writers.items():
+            def call_save(w: BaseWriter = writer) -> Path:
+                return w.save(data)
+
+            path = self._safe_execute(
+                func=call_save,
+                action_name=type(data).__name__,
+                writer_name=name
+            )
+
+            if path is not None:
                 saved_paths[name] = path
-            except OSError as e:
-                logger.error("Error saving with formatter %s: %s", name, e)
 
         return OutputFiles(**saved_paths)
 
     async def save(self, data: Transcript) -> OutputFiles:
         return await asyncio.to_thread(self._sync_save, data)
+
+    async def report(self, report: Report) -> None:
+        await asyncio.to_thread(
+            self._safe_execute,
+            lambda: self.writers.excel.save(report),
+            type(report).__name__,
+            self.writers.excel.get_name()
+        )
 
     async def process(self, transcripts: list[Transcript]) -> list[OutputFiles]:
         semaphore = asyncio.Semaphore(self.max_concurrent)
